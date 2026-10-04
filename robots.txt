@@ -30,4 +30,4 @@ Allow: /
 User-agent: Yeti
 Allow: /
 
-Sitemap: https://YOUR-ID.github.io/sitemap.xml
+Sitemap: https://minsunnyya.github.io/sitemap.xml
