@@ -1,0 +1,33 @@
+# 실습일지 도우미 — 모든 검색엔진·AI 검색 크롤러 환영
+User-agent: *
+Allow: /
+
+# AI 검색·답변 서비스 (ChatGPT, Claude, Perplexity, Gemini 등)
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Yeti
+Allow: /
+
+Sitemap: https://YOUR-ID.github.io/sitemap.xml
