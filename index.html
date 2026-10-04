@@ -1019,15 +1019,16 @@ function chooseType(type){
 /* ───────── 쿠팡 파트너스 · 배너 광고 ───────── */
 const isLocal = location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
 const goodUrl = u => /^https:\/\//.test(String(u || '').trim());
-// 쿠팡 다이내믹 배너는 스크립트라서, 화면을 다시 그려도 실행되도록 작은 iframe 안에서 돌려요
+// 쿠팡이 준 위젯 iframe을 페이지에 바로 넣어요. srcdoc으로 한 번 더 감싸면 개인 추적 주소가 빠집니다.
 function coupangWidgetHTML(){
   const w = COUPANG.widget; if (!w || !w.id) return '';
   const max = +w.width || 680, h = +w.height || 140;
   const width = Math.max(260, Math.min(max, (window.innerWidth || max) - 76));
-  const opts = JSON.stringify({id:+w.id, template:w.template || 'carousel', trackingCode:String(w.trackingCode || ''), width:String(width), height:String(h), tsource:String(w.tsource || '')});
-  const doc = `<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;padding:0;overflow:hidden;background:transparent}</style></head><body>`
-    + `<script src="https://ads-partners.coupang.com/g.js"><\/script><script>new PartnersCoupang.G(${opts});<\/script></body></html>`;
-  return `<iframe class="cp-frame" srcdoc="${esc(doc)}" width="${width}" height="${h}" scrolling="no" frameborder="0" loading="lazy" title="쿠팡 추천 상품"></iframe>`;
+  const src = 'https://ads-partners.coupang.com/widgets.html?' + new URLSearchParams({
+    id:String(+w.id), template:w.template || 'carousel', trackingCode:String(w.trackingCode || ''),
+    subId:'', width:String(width), height:String(h), tsource:String(w.tsource || '')
+  });
+  return `<iframe class="cp-frame" src="${esc(src)}" width="${width}" height="${h}" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" title="쿠팡 추천 상품"></iframe>`;
 }
 function slotHTML(name){
   const slot = COUPANG.slots[name]; if (!slot) return '';
