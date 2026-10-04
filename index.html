@@ -381,9 +381,6 @@ pre.prompt{white-space:pre-wrap;font-family:inherit;font-size:14px;line-height:1
 .post-d{display:block;color:var(--ink-2);font-size:15.5px;margin-top:4px}
 .post-m{display:block;color:var(--accent);font-weight:700;font-size:15px;margin-top:6px}
 .post:hover .post-t{color:var(--accent)}
-.visits{display:table;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:6px 16px;margin:0 auto 12px;font-size:15px;color:var(--ink-2)}
-.visits b{color:var(--accent)}
-.visits[hidden]{display:none}
 
 .about h3{font-size:18px;margin:18px 0 8px}
 .about p{margin:0 0 10px}
@@ -481,9 +478,9 @@ footer{font-size:14px;color:var(--muted);text-align:center;padding:8px 16px 40px
 <div class="wrap"><div id="ad-bottom" class="ad-slot" aria-label="광고"></div></div>
 
 <footer>
-  <div id="visits" class="visits" hidden></div>
   쓴 일지는 <b>이 기기의 브라우저에만</b> 저장돼요. 로그인이 필요 없어요.<br>
-  일지를 만들 때만 적은 내용이 AI(Cloudflare Workers AI)로 보내져요.
+  일지를 만들 때만 적은 내용이 AI(Cloudflare Workers AI)로 보내져요.<br>
+  방문자 수와 대략적인 지역(시·도, 시·군)만 익명으로 세요. IP 주소는 저장하지 않아요.
 </footer>
 
 <div id="wait" class="wait" hidden role="dialog" aria-modal="true" aria-labelledby="wait-t">
@@ -1529,19 +1526,15 @@ async function loadBlog(){
   if (tab === 'blog') renderBlog();
 }
 
-/* ───────── 방문자 수 ───────── */
+/* ───────── 방문자 수 (화면에는 안 보이고, 통계는 Worker의 /stats에서 운영자만 봐요) ───────── */
 async function loadVisits(){
   const base = API(); if (!base || /YOUR-WORKER/.test(base)) return;
   const today = todayStr();
-  const first = readLS('swj:visit') !== today;
+  if (readLS('swj:visit') === today) return; // 같은 기기는 하루 한 번만
   try {
-    const res = await fetch(base + '/visit' + (first ? '?hit=1' : ''));
+    const res = await fetch(base + '/visit?hit=1', {keepalive:true});
     const data = await res.json();
-    if (data.error || !(+data.total >= 0)) return;
-    if (first) writeLS('swj:visit', today);
-    const el = $('#visits');
-    el.innerHTML = `지금까지 <b>${(+data.total).toLocaleString()}명</b>이 다녀갔어요 · 오늘 <b>${(+data.today || 0).toLocaleString()}명</b>`;
-    el.hidden = false;
+    if (data.ok || +data.total >= 0) writeLS('swj:visit', today);
   } catch(e){}
 }
 
